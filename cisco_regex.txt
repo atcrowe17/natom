@@ -18,7 +18,7 @@
 "(?<=!\n)(interface.*\n)(.*\n)+?(?=!)"
 
 #Find the interface and description in a configuration
-^interface.*\r\n description.*
+"^interface.*\r\n description.*"
 
 IOS-XE to XR Conversions
 #Finds community-list (IOS-XE) using ios-regex and converts it to a community-set (IOS-XR)
