@@ -36,3 +36,6 @@ replace = "  \1"
 search = "ip access-list (extended|standard) (.*)"
 replace = "ipv4 access-list \2"
 
+#Updates permit and deny ACLs so ipv4 is used in place of ip
+search = "^ (permit|deny).{1,4}ip\b"
+replace = " \1 ipv4"
