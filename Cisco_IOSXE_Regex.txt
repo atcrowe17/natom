@@ -1,0 +1,22 @@
+#Finds all prefix-list lines
+prefix-list .* seq (.|..|...|....|.....|......|........|.........|..........|) (deny |permit )
+
+#Matches whole line that contains the text in parentheses
+^.*\b((Te|Gi|TenGigabitEthernet|GigabitEthernet)[1-9]/[1-9]|[1-9].)\b.*$
+
+#Find all empty lines
+^(?:[\t ]*(?:\r?\n|\r))+
+
+#Find all lines that DON'T contain the following ACE types
+(?=^(?!.(permit|deny).tcp))(?=^(?!.(permit|deny).udp))(?=^(?!.(permit|deny).ip))(?=^(?!.(permit|deny).icmp))(?=^(?!.(permit|deny).esp))(?=^(?!.remark.))(?=^(?!ipv4.))(?=(?!.remark))(?=^(?!.(permit|deny).gre))(?=^(?!.(permit|deny).ospf))(?=^(?!.(permit|deny).ahp))
+
+
+#Find all interface configurations
+(?<=!\n)(interface.*\n)(.*\n)+?(?=!)
+
+#Find the interface and description in a configuration
+^interface.*\r\n description.*
+
+#Regex to use to convert community-list (IOS-XE) to community-set (IOS-XR)
+search = ip community-list expanded (.*) permit (.*)
+replace = community-set \1\n ios-regex '\2'\n end-set
