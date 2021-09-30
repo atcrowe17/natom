@@ -1,22 +1,33 @@
+###USAGE - copy regexes contained within double quotes "" - including any whitespace.
+###TESTED ON - SublimeText for Mac. Build 4113
+
 #Finds all prefix-list lines
-prefix-list .* seq (.|..|...|....|.....|......|........|.........|..........|) (deny |permit )
+"prefix-list .* seq (.|..|...|....|.....|......|........|.........|..........|) (deny |permit )"
 
 #Matches whole line that contains the text in parentheses
-^.*\b((Te|Gi|TenGigabitEthernet|GigabitEthernet)[1-9]/[1-9]|[1-9].)\b.*$
+"^.*\b((Te|Gi|TenGigabitEthernet|GigabitEthernet)[1-9]/[1-9]|[1-9].)\b.*$"
 
 #Find all empty lines
-^(?:[\t ]*(?:\r?\n|\r))+
+"^(?:[\t ]*(?:\r?\n|\r))+"
 
 #Find all lines that DON'T contain the following ACE types
-(?=^(?!.(permit|deny).tcp))(?=^(?!.(permit|deny).udp))(?=^(?!.(permit|deny).ip))(?=^(?!.(permit|deny).icmp))(?=^(?!.(permit|deny).esp))(?=^(?!.remark.))(?=^(?!ipv4.))(?=(?!.remark))(?=^(?!.(permit|deny).gre))(?=^(?!.(permit|deny).ospf))(?=^(?!.(permit|deny).ahp))
+"(?=^(?!.(permit|deny).tcp))(?=^(?!.(permit|deny).udp))(?=^(?!.(permit|deny).ip))(?=^(?!.(permit|deny).icmp))(?=^(?!.(permit|deny).esp))(?=^(?!.remark.))(?=^(?!ipv4.))(?=(?!.remark))(?=^(?!.(permit|deny).gre))(?=^(?!.(permit|deny).ospf))(?=^(?!.(permit|deny).ahp))"
 
 
 #Find all interface configurations
-(?<=!\n)(interface.*\n)(.*\n)+?(?=!)
+"(?<=!\n)(interface.*\n)(.*\n)+?(?=!)"
 
 #Find the interface and description in a configuration
 ^interface.*\r\n description.*
 
-#Regex to use to convert community-list (IOS-XE) to community-set (IOS-XR)
-search = ip community-list expanded (.*) permit (.*)
-replace = community-set \1\n ios-regex '\2'\n end-set
+IOS-XE to XR Conversions
+#Finds community-list (IOS-XE) using ios-regex and converts it to a community-set (IOS-XR)
+search = "ip community-list expanded (.*) permit (.*)"
+replace = "community-set \1\n ios-regex '\2'\n end-set"
+
+#Finds named ip route statements, captures the network-id/subnet mask as /1 and the name as /2. Use subsequent regex for any non-named routes.
+search = "ip route (.*)name (.*)"
+replace = "  \1description "\2""
+#Finds ip route statements and captures any values, not including "ip route ", as \1. Use after above named ip route regex.
+search = "ip route (.*)"
+replace = "  \1"
