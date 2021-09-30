@@ -20,14 +20,19 @@
 #Find the interface and description in a configuration
 "^interface.*\r\n description.*"
 
-IOS-XE to XR Conversions
+***IOS-XE to XR Conversions***
 #Finds community-list (IOS-XE) using ios-regex and converts it to a community-set (IOS-XR)
 search = "ip community-list expanded (.*) permit (.*)"
 replace = "community-set \1\n ios-regex '\2'\n end-set"
 
-#Finds named ip route statements, captures the network-id/subnet mask as /1 and the name as /2. Use subsequent regex for any non-named routes.
+#Finds named ip route statements, captures the network-id/subnet mask and name. Use subsequent regex for any non-named routes.
 search = "ip route (.*)name (.*)"
 replace = "  \1description "\2""
-#Finds ip route statements and captures any values, not including "ip route ", as \1. Use after above named ip route regex.
+#Finds ip route statements and captures any values, not including "ip route ". Use after above named ip route regex.
 search = "ip route (.*)"
 replace = "  \1"
+
+#Updates named extended and standard ACL names to XR format. Does not update numbered ACLs.
+search = "ip access-list (extended|standard) (.*)"
+replace = "ipv4 access-list \2"
+
