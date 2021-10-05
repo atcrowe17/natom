@@ -185,7 +185,7 @@ def config_gen_ints(ints_to_gen, int_config_file):
             int_config.writelines(no_match_int_config)
             print("Interface type " + interface['type'] + " not defined.")
 
-directory = "/home/tcrowe/shares/iCloud Drive/Ansible/cml/STIG_Automation/temp/backups"
+directory = "/home/tcrowe/shares/iCloud Drive/GitRepos/network_stig_automation/temp/backups"
 for file in os.listdir(directory):
     interface_dict = {'interface_table': []}
     filename = file
@@ -200,6 +200,6 @@ def lisp_int():
     return(None)
 
 
-save_results = open('interface_table.txt', 'w')
+save_results = open('/home/tcrowe/shares/iCloud Drive/GitRepos/network_stig_automation/temp/interface_table.txt', 'w')
 print(interface_dict, file=save_results)
 print(interface_dict)
