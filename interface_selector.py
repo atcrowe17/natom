@@ -8,6 +8,18 @@ import os
 def add_to_interface_dict(interface):
     interface_dict['interface_table'].append(interface)
 
+def shutdown_int(int_re_result_item):
+    print(int_re_result_item)
+    re_shut_port = re.compile(r'^.shutdown.*', re.M).search(int_re_result_item)
+    if re_shut_port != None:
+        re_port_label = re.compile(r'interface.*').match(int_re_result_item)
+        interface = {}
+        interface['label'] = re_port_label.group()
+        interface['type'] = "shutdown"
+    #            interface['location'] = "internal" "external"
+        print(interface)
+        add_to_interface_dict(interface)
+
 def vlan_int(int_re_result_item):
     re_vlan_int = re.compile(r'interface Vlan.*', re.M).search(int_re_result_item)
     if re_vlan_int != None:
@@ -88,12 +100,17 @@ def ints_from_config (config_file):
     execute_re = re_get_ints.finditer(read_config)
     for result in execute_re:
         result_value = result.group()
+        shutdown_int(result_value)
         l2_access_int(result_value)
         l2_dot1q_int(result_value)
         vlan_int(result_value)
         l3_phy_int(result_value)
         loop_int(result_value)
         tunnel_int(result_value)
+
+def config_gen_shutdown (shutdown_int):
+    shutdown_config_list = [shutdown_int['label'] + "\n", " description <== DISABLED ==>\n", " switchport access vlan 2\n", " switchport mode access\n", " no logging event link-status\n", " shutdown\n", " no cdp enable\n", " no snmp trap link-status\n", "!\n"]
+    return(shutdown_config_list)
 
 def config_gen_l2_access (l2_access_int):
     l2_access_config_list = [l2_access_int['label'] + "\n", " spanning-tree bpduguard enable\n", "!\n"]
@@ -116,11 +133,14 @@ def config_gen_ints_loopback(loopback_int):
     return(loopback_config_list)
 
 def config_gen_ints(ints_to_gen, int_config_file):
-    directory = "/home/tcrowe/shares/iCloud Drive/Ansible/cml/STIG_Automation/temp/stig_int_config/"
+    directory = "./configs/created/"
     int_config = open(directory + filename, 'w')
     int_config.writelines("!\n")
     for interface in interface_dict['interface_table']:
-        if interface['type'] == "l2_access":
+        if interface['type'] == "shutdown":
+            shutdown_int_config = config_gen_shutdown(interface)
+            int_config.writelines(shutdown_int_config)
+        elif interface['type'] == "l2_access":
             l2_access_int_config = config_gen_l2_access(interface)
             int_config.writelines(l2_access_int_config)
         elif interface['type'] == "l2_dot1q":
@@ -138,7 +158,7 @@ def config_gen_ints(ints_to_gen, int_config_file):
         else:
             print("Interface type " + interface['type'] + " not defined.")
 
-directory = "/home/tcrowe/shares/iCloud Drive/Ansible/cml/STIG_Automation/temp/backups"
+directory = "./configs/source/"
 for file in os.listdir(directory):
     interface_dict = {'interface_table': []}
     filename = file
